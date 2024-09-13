@@ -46,8 +46,8 @@ void print_list(struct node* head){
 // free memory
 void free_mem(struct node* head){
     struct node* now;
-    now = head;
     while(now != NULL){
+        now = head;
         free(now);
         now = now ->next;
     }

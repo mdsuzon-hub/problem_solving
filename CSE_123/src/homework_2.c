@@ -56,17 +56,15 @@ void print_list(struct node* head){
     printf("END\n");
 }
 
-
 // free memory
-void free_mem(struct node* head){
+void free_mem(struct node* head) {
     struct node* now;
-    now = head;
-    while(now != NULL){
+    while (head != NULL) {
+        now = head;
+        head = head->next;
         free(now);
-        now = now ->next;
     }
 }
-
 
 int main() {
     // --create 10 node--
