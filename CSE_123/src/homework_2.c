@@ -56,6 +56,7 @@ void print_list(struct node* head){
     printf("END\n");
 }
 
+
 // free memory
 void free_mem(struct node* head){
     struct node* now;
