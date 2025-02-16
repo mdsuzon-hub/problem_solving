@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void bubble_sort(int *array, int size){     // Bubble Short O(n^2)
+void bubble_sort(int *array, int size){     // Bubble Sort O(n^2)
     int temp, exc = 0, pass_count = 0;
 
     for(int i = 0; i < size - 1; i++){
