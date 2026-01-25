@@ -1,0 +1,152 @@
+{
+    "C Basic Includes": {
+        "prefix": "cinc",
+        "body": [
+            "#include <stdio.h>",
+            "#include <ctype.h>",
+            "#include <string.h>",
+            "#define MAX 100",
+            "",
+            "int main(){",
+            "    $0",
+            "    return 0;",
+            "}"
+        ],
+        "description": "Basic C includes with main function"
+    },
+	
+    "C File Open/Close": {
+        "prefix": "cfile",
+        "body": [
+            "FILE *$1 = fopen(\"$2\", \"$3\");",
+            "if (!$1){",
+            "    printf(\"Cannot open file $2\\n\");",
+            "    return 1;",
+            "}",
+            "",
+            "$0",
+            "",
+            "fclose($1);"
+        ],
+        "description": "Open a file with error check and close it"
+    },
+
+    "C Lexical Analyzer Function": {
+        "prefix": "clex",
+        "body": [
+            "void lexicalAnalyzer(FILE *${1:fp}){",
+            "    char c;",
+            "    char token[MAX];",
+            "    int k = 0;",
+            "",
+            "    while ((c = fgetc(${1:fp})) != EOF){",
+            "        if (isspace(c)) continue;",
+            "",
+            "        else if(c=='/'){",
+            "            k = 0;",
+            "            token[k++] = c;",
+            "            c = fgetc(${1:fp});",
+            "",
+            "            if(c=='/'){",
+            "                token[k++] = c;",
+            "                c = fgetc(${1:fp});",
+            "                while(c != '\\n' && k < MAX - 1){",
+            "                    token[k++] = c;",
+            "                    c = fgetc(${1:fp});",
+            "                }",
+            "                token[k] = '\\0';",
+            "            }",
+            "            else {",
+            "                token[k++] = '\\0';",
+            "                printf(\"Token: %-20s \\tType: OPERATOR\\n\", token);",
+            "                ungetc(c, ${1:fp});",
+            "            }",
+            "        }",
+            "",
+            "        else if (isalpha(c) || c == '_'){",
+            "            k = 0;",
+            "            token[k++] = c;",
+            "            while ((isalnum(c = fgetc(${1:fp})) || c == '_') && k < MAX - 1){",
+            "                token[k++] = c;",
+            "            }",
+            "            token[k] = '\\0';",
+            "            if (c != EOF) ungetc(c, ${1:fp});",
+            "",
+            "            if (isKeyword(token))",
+            "                printf(\"Token: %-20s \\tType: KEYWORD\\n\", token);",
+            "            else",
+            "                printf(\"Token: %-20s \\tType: IDENTIFIER\\n\", token);",
+            "        }",
+            "",
+            "        else if (isdigit(c)){",
+            "            k = 0;",
+            "            token[k++] = c;",
+            "            while (isdigit(c = fgetc(${1:fp})) && k < MAX - 1){",
+            "                token[k++] = c;",
+            "            }",
+            "            token[k] = '\\0';",
+            "            if (c != EOF) ungetc(c, ${1:fp});",
+            "",
+            "            printf(\"Token: %-20s \\tType: NUMBER\\n\", token);",
+            "        }",
+            "",
+            "        else if (c == '\"'){",
+            "            k = 0;",
+            "            token[k++] = '\"';",
+            "            while ((c = fgetc(${1:fp})) != '\"' && c != EOF && k < MAX - 1){",
+            "                token[k++] = c;",
+            "            }",
+            "            token[k++] = '\"';",
+            "            token[k] = '\\0';",
+            "",
+            "            printf(\"Token: %-20s \\tType: STRING_LITERAL\\n\", token);",
+            "        }",
+            "",
+            "        else {",
+            "            token[0] = c;",
+            "            token[1] = '\\0';",
+            "            printf(\"Token: %-20s \\tType: SPECIAL_SYMBOL\\n\", token);",
+            "        }",
+            "    }",
+            "}"
+        ],
+        "description": "Lexical Analyzer function for C files"
+    },
+
+    "C Keywords Array and isKeyword Function": {
+        "prefix": "ckey",
+        "body": [
+            "char *${1:keywords}[] = {\"int\", \"return\", \"include\", \"printf\"};",
+            "int ${2:num_keywords} = 4;",
+            "",
+            "int isKeyword(char ${3:str}[]){",
+            "    for (int i = 0; i < ${2:num_keywords}; i++){",
+            "        if (strcmp(${3:str}, ${1:keywords}[i]) == 0)",
+            "            return 1;",
+            "    }",
+            "    return 0;",
+            "}"
+        ],
+        "description": "Define keywords array and isKeyword function"
+    },
+
+	"Print Token Function": {
+    "prefix": "ptoken",
+    "body": [
+        "void printToken(char ${1:token}[], char ${2:type}[]){",
+        "    printf(\"║ %-26s ║ %-20s ║\\\\n\", ${1:token}, ${2:type});",
+        "}"
+    ],
+    "description": "Print a token and its type in a formatted ASCII table row"
+	}
+
+}
+
+// ╔═══════════════════════════════════════════════════╗
+// ║                   LEXER OUTPUT                    ║
+// ╚═══════════════════════════════════════════════════╝
+// ╔════════════════════════════╦══════════════════════╗
+// ║ Token                      ║ Type                 ║
+// ╠════════════════════════════╬══════════════════════╣
+// ║                            ║                      ║
+// ╚════════════════════════════╩══════════════════════╝
