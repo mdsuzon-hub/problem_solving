@@ -83,3 +83,84 @@ int main() {
 
     return 0;
 }
+
+// a*
+// a*b+
+// abbc
+
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_STATES 8
+#define NUM_INPUTS 4
+#define MAX_LEN 100
+
+// DFA States
+enum { 
+    D0,   // Start state (a*)
+    D1,   // After reading 'a' (a*)
+    D2,   // In b+ loop (a*b+)
+    D3,   // After reading "ab"
+    D4,   // After reading "abb"
+    D5,   // After reading "abbc" (final accepting state)
+    DEAD  // Trap state
+};
+
+// Input mapping
+// a -> 0, b -> 1, c -> 2, other -> 3
+int get_input(char c) {
+    if (c == 'a') return 0;
+    if (c == 'b') return 1;
+    if (c == 'c') return 2;
+    return 3;
+}
+
+// Accepting states with tokens
+const char* accepting_tokens[NUM_STATES] = {
+    "a*",        // D0
+    "a*",        // D1
+    "a*b+",      // D2
+    NULL,        // D3
+    NULL,        // D4
+    "abbc",      // D5
+    NULL         // DEAD
+};
+
+int main() {
+
+    // DFA transition table
+    int next_state[NUM_STATES][NUM_INPUTS] = {
+        /* D0 */ { D1, D2, DEAD, DEAD },
+        /* D1 */ { D1, D3, DEAD, DEAD },
+        /* D2 */ { DEAD, D2, DEAD, DEAD },
+        /* D3 */ { DEAD, D4, DEAD, DEAD },
+        /* D4 */ { DEAD, DEAD, D5, DEAD },
+        /* D5 */ { DEAD, DEAD, DEAD, DEAD },
+        /* DEAD */{ DEAD, DEAD, DEAD, DEAD }
+    };
+
+    char str[MAX_LEN];
+
+    printf("Enter a string: ");
+    fgets(str, sizeof(str), stdin);
+    str[strcspn(str, "\n")] = '\0';
+
+    int state = D0;
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        int input = get_input(str[i]);
+        state = next_state[state][input];
+        if (state == DEAD)
+            break;
+    }
+
+    if (state != DEAD && accepting_tokens[state]) {
+        printf("\"%s\" Accepted → Token: %s\n", str, accepting_tokens[state]);
+    } else {
+        printf("\"%s\" Rejected\n", str);
+    }
+
+    return 0;
+}
+
+
