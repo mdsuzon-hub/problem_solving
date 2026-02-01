@@ -150,3 +150,48 @@
 // ╠════════════════════════════╬══════════════════════╣
 // ║                            ║                      ║
 // ╚════════════════════════════╩══════════════════════╝
+
+
+printf("\n╔══════════════════════════════════════════════════════════════╗\n");
+    printf("║                          DFA LEXER                           ║\n");
+    printf("╚══════════════════════════════════════════════════════════════╝\n\n");
+    printf("╔════════════════════╦════════════════════╦════════════════════╗\n");
+    printf("║ Token Pattern      ║ Token Status       ║ Input String       ║\n");
+    printf("╠════════════════════╬════════════════════╬════════════════════╣");
+
+    while (1){
+        printf("\tEnter a string: ");
+
+        if (!fgets(str, sizeof(str), stdin)) {
+            printf("\tInput error\n");
+            return 1;
+        }
+
+        // Remove trailing newline if present
+        str[strcspn(str, "\n")] = '\0';
+
+        if(strcmp(str, "exit") == 0){
+            printf("║ %-18s ║ %-18s ║ %-18s ║\n", "-", "Exit", str);
+            printf("╚════════════════════╩════════════════════╩════════════════════╝\n");
+            break;
+        }
+
+        int state = D0;
+
+        for (int i = 0; str[i] != '\0'; i++) {
+            int input = get_input(str[i]);
+            state = next_state[state][input];
+
+            if (state == DEAD)
+                break;
+        }
+
+        // Final acceptance check
+        if (state != DEAD && accepting_tokens[state] != NULL) {
+            printf("║ %-18s ║ %-18s ║ %-18s ║\n", accepting_tokens[state], "ACCEPTED", str);
+        } else {
+            printf("║ %-18s ║ %-18s ║ %-18s ║\n", "-", "REJECTED", str);
+        }
+        printf("╠════════════════════╬════════════════════╬════════════════════╣");
+
+    }
