@@ -167,3 +167,76 @@ int main() {
 
     return 0;
 }
+
+
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_STATES 12
+#define NUM_INPUTS 4
+
+// DFA states
+enum { D0, D1, D2, D3, D4, D5,D6,D7,D8,D9,D10, DEAD };
+
+// Input mapping: a -> 0, b -> 1, other -> 2
+int get_input(char c) {
+    if (c == 'a') return 0;
+    if (c == 'b') return 1;
+    if (c == 'c') return 2;
+    return 3; // invalid input
+}
+
+// Accepting states with token labels
+const char* accepting_tokens[NUM_STATES] = {
+    NULL,        // D0
+    NULL,        // D1
+    NULL,        // D2
+    NULL,        // D3
+    "ac*b",      // D4
+    NULL,        // D5
+    NULL,        // D6
+    "a*b+c,bc+", // D7
+    "a*b+c",     // D8
+    "ac*b",      // D9
+    "bc+",       // D10
+    NULL         // DEAD
+};
+
+int main() {
+    // DFA transition table: next_state[current_state][input_symbol]
+    int next_state[NUM_STATES][NUM_INPUTS] = {
+        /* D0 */ { D1, D2, DEAD,DEAD },
+        /* D1 */ { D3, D4, D5,DEAD },
+        /* D2 */ { DEAD, D6, D7,DEAD },
+        /* D3 */ { D3, D6, DEAD,DEAD },
+        /* D4 */ { DEAD, D6,D8,DEAD },
+        /* D5 */ { DEAD, D9, D5 ,DEAD },
+        /* D6 */ { DEAD, D6, D8 ,DEAD },
+        /*D7*/   { DEAD, DEAD, D10 , DEAD },
+        /*D8*/   { DEAD, DEAD, DEAD ,DEAD },
+        /*D9*/   { DEAD, DEAD, DEAD ,DEAD },
+        /*D10*/  { DEAD, DEAD, D10, DEAD },
+        /* DEAD */{ DEAD, DEAD, DEAD ,DEAD }
+    };
+
+    char str[100];
+    printf("Enter a string: ");
+    //scanf("%s", str);
+    gets(str);
+
+    int state = D0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        int input = get_input(str[i]);
+        state = next_state[state][input];
+        if (state == DEAD) break;
+    }
+
+    // Check if the final state is accepting
+    if (accepting_tokens[state] != NULL) {
+        printf("%s Accepted by DFA: %s\n", str, accepting_tokens[state]);
+    } else {
+        printf("%s Rejected by all patterns\n", str);
+    }
+
+    return 0;
+}
